@@ -10,11 +10,15 @@ public class UnityToNode : MonoBehaviour
     public string host;          //127.0.0.1
     public int port;             //3030
 
-    public string idUri;         // 경로 주소 설정
-    public string postUri;
+    public string idUrl;         // 경로 주소 설정
+    public string postUrl;
+    public string resDataUrl;
+    public string startConstructionUrl;
+    public string checkConstructionUrl;
 
     public Button btnGetExample;
     public Button btnPostExample;
+    public Button btnResDataExample;
 
     public int id;
     public string data;
@@ -23,7 +27,7 @@ public class UnityToNode : MonoBehaviour
     {
         this.btnPostExample.onClick.AddListener(() =>
         {
-            var url = string.Format("{0}:{1}/{2}", host, port, idUri);  //URL 주소 생성 
+            var url = string.Format("{0}:{1}/{2}", host, port, idUrl);  //URL 주소 생성 
             Debug.Log(url);
 
             var req = new Protocols.Packets.req_data();
@@ -41,7 +45,7 @@ public class UnityToNode : MonoBehaviour
         });
         this.btnGetExample.onClick.AddListener(() =>
         {
-            var url = string.Format("{0}:{1}/{2}", host, port, idUri);  //URL 주소 생성 
+            var url = string.Format("{0}:{1}/{2}", host, port, idUrl);  //URL 주소 생성 
             Debug.Log(url);
 
             StartCoroutine(this.GetData(url, (raw) => 
@@ -50,9 +54,23 @@ public class UnityToNode : MonoBehaviour
 
                     Debug.LogFormat("{0}, {1}", res.cmd, res.message);          //디버그로그로 서버에서 보내준 것 확인
             }));
-                
-                
+        });
 
+        this.btnResDataExample.onClick.AddListener(() =>
+        {
+            var url = string.Format("{0}:{1}/{2}", host, port, idUrl);  //URL 주소 생성 
+            Debug.Log(url);
+
+            StartCoroutine(this.GetData(url, (raw) =>
+            {
+                var res = JsonConvert.DeserializeObject<Protocols.Packets.res_data>(raw);    //Json 변환
+
+                foreach (var user in res.result)
+                {
+                    Debug.LogFormat("{0}, {1}", res.cmd, res.message);          //디버그로그로 서버에서 보내준 것 확인
+                }
+
+            }));
         });
     }
 
