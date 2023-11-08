@@ -81,8 +81,40 @@ public class BagManager : MonoBehaviour
 
 
     }
+    public void RemoveItem()
+    {
+        BagRequest request = new BagRequest
+        {
+            user_id = user_id,
+            item_name = removeItemInputField.text
+        };
+
+        string jsonData = JsonConvert.SerializeObject(request);
+        StartCoroutine(RemoveItemToBagCoroutine(jsonData));
+    }
+    IEnumerator RemoveItemToBagCoroutine(string jsonData)
+    {
+        UnityWebRequest webRequest = new UnityWebRequest(serverURL + "bag/remove", "POST");
+        webRequest.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
+        webRequest.downloadHandler = new DownloadHandlerBuffer();
+        webRequest.SetRequestHeader("Content-Type", "application/json");
+
+        yield return webRequest.SendWebRequest();
+
+        if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
+           webRequest.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.Log("서버 요청 실패: " + webRequest.error);
+        }
+        else
+        {
+            string jsonResponse = webRequest.downloadHandler.text;
+            bagContentsText.text = jsonResponse;
+        }
+        webRequest.Dispose();
 
 
+    }
 
 }
 
